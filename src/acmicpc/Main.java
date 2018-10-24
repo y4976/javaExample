@@ -31,9 +31,9 @@ public class Main
 		
 		for (int i = 0; i < n; i++) {
 			initProperty();
-			process();
-			System.out.println(stringBuilder.toString());
+			process();			
 		}
+		System.out.println(stringBuilder.toString());
 	}
 	
 	static class keyboard {

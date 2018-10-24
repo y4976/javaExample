@@ -1,6 +1,7 @@
 //indegree study... 
 //나중에 한번 더 풀어 볼 것.
 //시험 복붙용 기본 폼
+//re practice
 
 package acmicpc;
 
@@ -22,7 +23,7 @@ public class Q1005
 	private static int targetVertex;
 	
 	private static void initProperty()
-	{
+	{		
 		n = keyboard.nextInt();
 		edgeCount = keyboard.nextInt();
 								

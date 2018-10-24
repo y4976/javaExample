@@ -11,79 +11,196 @@ public class Q1006
 	
 	private static int districtCount;
 	private static int armyCount;
-	private static int[] map;
+	private static int[] cost;
 	
-	private static boolean[] isInput;
-	private static int count;
-	private static int[][] possible;
-	private static int neighborCount;
-	
+	private static ArrayList<ArrayList<Integer>> adj = new ArrayList<ArrayList<Integer>>();
+	private static ArrayList<Integer> maxCoupleCount = new ArrayList<Integer>();
+	private static ArrayList<Integer> g = new ArrayList<Integer>();
+	private static ArrayList<Integer> dp = new ArrayList<Integer>();
+	private static boolean[] dupVertex;	
+		
 	private static void initProperty()
 	{
 		districtCount = keyboard.nextInt();
 		armyCount = keyboard.nextInt();
-		map = new int[districtCount * 2];
-		isInput = new boolean[districtCount * 2];
-		count = districtCount * 2;
-		possible = new int[districtCount * 2][districtCount * 2];
-		neighborCount = 0;
-		
-		for (int i = 0; i < map.length; i++) {
-			map[i] = keyboard.nextInt();
-			isInput[i] = true;
-		}		
+		cost = new int[districtCount * 2];
+		dupVertex = new boolean[districtCount * 2];
+		adj.clear();
+		maxCoupleCount.clear();
+				
+		for (int i = 0; i < cost.length; i++) {
+			cost[i] = keyboard.nextInt();
+		}
+				
+		for (int i = 0; i < districtCount * 2; i++) {
+			adj.add(new ArrayList<Integer>());
+			
+			int[] neighborIndexes = getNeighborIndexes(i);
+			
+			for (int j : neighborIndexes) {
+				if (cost[i] + cost[j] <= armyCount) {
+					adj.get(i).add(j);
+				}					
+			}
+		}
 	}
 	
 	private static void process() 
 	{		
-		for (int i = 0; i < map.length; i++) {
-			int[] neighborIndexes = getNeighborIndexes(i);
+		ArrayList<Queue<Integer>> adj2 = new ArrayList<Queue<Integer>>();
+		
+		for (int j = 0; j < adj.size(); j++) {
+			adj2.add(new LinkedList<Integer>());
+			for (int k = 0; k < adj.get(j).size(); k++) {
+				adj2.get(j).add(adj.get(j).get(k));
+			}
+		}				
+		
+		int coupleCount = 0;
+		for (int i = 0; i < adj2.size(); i++) {
+			if (adj2.get(i).isEmpty()) continue;
 			
-			for (int j : neighborIndexes) {
-				if (map[i] + map[j] <= armyCount) {
-					if (possible[j][i] == 0) {
-						possible[i][j] = 1;
-						isInput[i] = false;
-						isInput[j] = false;
-						neighborCount++;	
-					}					
-				}
-			}
-		}
-		
-		for (int i = 0; i < possible.length; i++) {
-			for (int j = 0; j < possible.length; j++) {
-				if (possible[i][j] == 1) {
+			Queue<Integer> q = new LinkedList<Integer>();			
+			
+			g.clear();
+			dp.clear();
+			q.add(i);
+			g.add(i);
+			while(!q.isEmpty()) {
+				int now = q.poll();
+				
+				while(!adj2.get(now).isEmpty()) {
+					int temp = adj2.get(now).poll();
 					
-				}
+					if (!g.contains(temp)) {
+						q.add(temp);
+						g.add(temp);
+					}										
+				}				
 			}
+			
+			for (int j = 0; j < adj.size(); j++) {
+				dp.add(0);
+			}
+			
+//			int temp = dfs(g.get(0));
+//			coupleCount += temp;
+//						
+//			stringBuilder.append(String.valueOf(temp) + "\n");
+//			stringBuilder.append(dp.toString() + "\n");
+			stringBuilder.append(g.toString() + "\n");
+			stringBuilder.append("\n");
 		}
 		
-//		stringBuilder.append(Arrays.toString(possible[0]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[1]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[2]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[3]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[4]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[5]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[6]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[7]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[8]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[9]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[10]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[11]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[12]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[13]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[14]) + "\n");
-//		stringBuilder.append(Arrays.toString(possible[15]) + "\n");		
-//		stringBuilder.append(neighborCount + "\n");
-		stringBuilder.append(Arrays.toString(isInput) + "\n");		
+		stringBuilder.append(String.valueOf(districtCount * 2 - coupleCount) + "\n");
+		stringBuilder.append("\n");
+		
+		for (int i = 0; i < adj.size(); i++) {
+			stringBuilder.append(String.valueOf(i) + " : " + adj.get(i).toString() + "\n");	
+		}
 	}
 	
-	private static void dfs(int index)
+	private static int dfs(int vertex)
+	{	
+		if (vertex == g.get(g.size() - 1)) {
+			return 0;
+		}
+		
+		if (dp.get(vertex) != 0) {
+			return dp.get(vertex);
+		}
+		
+		int max = dp.get(vertex);
+		
+		if (adj.get(vertex).size() == 3) {
+			
+		} else {
+			for (int i = 0; i < adj.get(vertex).size(); i++) {		
+				if (dupVertex[adj.get(vertex).get(i)]) continue;
+				dupVertex[adj.get(vertex).get(i)] = true;
+				max = Math.max(max, dfs(adj.get(vertex).get(i)));
+				
+				int nextVertex = adj.get(vertex).get(i);
+				
+				for (int j = 0; j < adj.get(nextVertex).size(); j++) {
+					if (dupVertex[adj.get(nextVertex).get(j)]) continue;
+					dupVertex[adj.get(nextVertex).get(j)] = true;
+	
+					max = Math.max(max, 1 + dfs(adj.get(nextVertex).get(j)));
+					 
+					dupVertex[adj.get(nextVertex).get(j)] = false;
+				}
+					
+				dupVertex[adj.get(vertex).get(i)] = false;
+			}		
+		}
+		
+		dp.set(vertex, max);
+		return max;
+	}
+	
+//	private static int dfs(int index)
+//	{	
+//		if (index >= g.size() - 1) {
+//			return 0;
+//		}
+//		
+//		if (dp.get(index) != 0) {
+//			return dp.get(index);
+//		}
+//		
+//		int max = dp.get(index);
+//		
+////		for (int i = 0; i < adj.get(g.get(index)).size(); i++) {
+////			for (int j = 0; j < g.size(); j++) {
+////				if (g.get(j) == adj.get(g.get(index)).get(i)) {
+////					max = Math.max(max, dfs(j));
+////				}				
+////			}			
+////		}
+//		
+//		//자기 x
+//		if (isConnect(g.get(index), g.get(index + 1))) {
+//			max = Math.max(max, dfs(index + 1));
+//		} 
+//		//자기 x		
+//		if (index + 2 < g.size() - 1 && isConnect(g.get(index), g.get(index + 2))) {
+//			max = Math.max(max, dfs(index + 2));
+//		}
+//		
+//		if (adj.get(g.get(index + 1)).size() > 2) {
+//			int count = 0;
+//			for (int i = 0; i < adj.get(g.get(index + 1)).size(); i++) {
+//				if (adj.get(g.get(index + 1)).get(i) == index) continue;
+//
+//				// 자기 x				
+//				max = Math.max(max, 1 + dfs(index + 1 + count));
+//				count++;
+//			}
+//		} else {
+//			// 자기 x			
+//			max = Math.max(max, 1 + dfs(index + 2));
+//		}
+//		
+////		for (int i = 0; i < adj.get(g.get(index + 1)).size(); i++) {
+////			if (adj.get(g.get(index + 1)).get(i) == index) continue;
+////		}
+//		
+//		dp.set(index, max);
+//		return max;
+//	}
+		
+	
+	private static boolean isConnect(int vertex1, int vertex2)
 	{
-		
-	}	
-		
+		for (int i = 0; i < adj.get(vertex1).size(); i++) {
+			if (adj.get(vertex1).get(i) == vertex2) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	private static int[] getNeighborIndexes(int index)
 	{
 		int[] result = new int[3];
@@ -122,9 +239,9 @@ public class Q1006
 		
 		for (int i = 0; i < n; i++) {
 			initProperty();
-			process();
-			System.out.println(stringBuilder.toString());
+			process();			
 		}
+		System.out.println(stringBuilder.toString());
 	}
 	
 	static class keyboard {
