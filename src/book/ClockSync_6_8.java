@@ -1,9 +1,8 @@
 package book;
 
-import java.util.*;
-
 public class ClockSync_6_8 extends CommonExample
 {	
+	private static final int INF = 987654321;
 	private int[][] button = 
 		{
 			{1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -20,13 +19,10 @@ public class ClockSync_6_8 extends CommonExample
 						
 	
 	private int[] clock = new int[16];
-	private int[] pushCount = new int[16];
-	private ArrayList<Integer> resultSet;
 	
 	@Override
 	protected void initProperty()
 	{
-		resultSet = new ArrayList<Integer>();
 		for (int i = 0; i < 16; i++) {
 			clock[i] = (int) (keyboard.nextInt()/3);
 		}		
@@ -34,33 +30,30 @@ public class ClockSync_6_8 extends CommonExample
 	
 	@Override
 	protected void solve() 
-	{	
-		pushButton(0, 0);
-		
-		stringBuilder.append(Collections.min(resultSet) + "\n");
+	{			
+		stringBuilder.append(pushButton(0) + "\n");
 	}		
 	
-	private void pushButton(int index, int depth)
+	private int pushButton(int buttonIndex)
 	{
-		if (isSync()) {
-			resultSet.add(depth);
-		}			
-				
-		for (int i = index; i < button.length; i++) {
-			if (pushCount[i] > 3) continue;
-						
-			pushCount[i]++;
-			for (int j = 0; j < 16; j++) {
-				clock[j] += button[i][j]; 
+		if (buttonIndex > button.length - 1) {
+			if (isSync()) {
+				return 0;
+			} else {	
+				return INF;
 			}
-			
-			pushButton(i, depth + 1);
-			
+		}					
+		
+		int result = INF;
+		
+		for (int i = 0; i < 4; i++) {
+			result = Math.min(result, i + pushButton(buttonIndex + 1));
 			for (int j = 0; j < 16; j++) {
-				clock[j] -= button[i][j]; 
-			}		
-			pushCount[i]--;
-		}
+				clock[j] += button[buttonIndex][j]; 
+			}
+		}		
+		
+		return result;
 	}
 	
 	private boolean isSync()
