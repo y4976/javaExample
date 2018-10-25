@@ -9,7 +9,8 @@ public class BookMain
 //		exam = new Picnic_6_4();
 //		exam = new BoardCorver_6_5();
 //		exam = new ClockSync_6_8();
-		exam = new QuadTree_7_2();
+//		exam = new QuadTree_7_2();
+		exam = new Fence_7_4();
 		exam.process();
 	}
 }
